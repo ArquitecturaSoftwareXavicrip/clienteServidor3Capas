@@ -11,6 +11,7 @@ from app.controllers.empresa_controller import empresa_bp
 from app.controllers.servicio_controller import servicio_bp
 from app.controllers.contrato_controller import contrato_bp
 from app.controllers.prestamo_controller import prestamo_bp
+from app.models.prestamo import Prestamo
 
 # Cargar variables de entorno desde archivo .env
 load_dotenv()
