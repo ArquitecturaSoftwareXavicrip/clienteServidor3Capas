@@ -312,4 +312,3 @@ const ContratoView = () => {
 export default ContratoView;
 
 
-

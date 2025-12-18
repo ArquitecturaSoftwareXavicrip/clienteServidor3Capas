@@ -67,4 +67,3 @@ def delete_contrato(contrato_id):
         return jsonify({'error': str(e)}), 500
 
 
-

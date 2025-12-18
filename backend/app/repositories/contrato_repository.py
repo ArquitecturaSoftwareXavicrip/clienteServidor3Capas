@@ -77,4 +77,3 @@ class ContratoRepository:
         return True
 
 
-

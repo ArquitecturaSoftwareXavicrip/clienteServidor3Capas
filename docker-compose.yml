@@ -3,14 +3,19 @@ version: '3.8'
 services:
   # Tier 3: Base de Datos
   database:
-    image: sqlite:latest
+    image: postgres:15-alpine
     container_name: limpieza_db
+    environment:
+      - POSTGRES_USER=limpieza_user
+      - POSTGRES_PASSWORD=contraseña_segura_123
+      - POSTGRES_DB=limpieza_empresas
     volumes:
-      - ./database:/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
     networks:
       - app-network
-    # Nota: SQLite no requiere un contenedor separado, pero se incluye para demostrar la separación de tiers
-    # En producción, usar PostgreSQL o MySQL
 
   # Tier 2: Backend (Lógica de Negocio)
   backend:
@@ -23,15 +28,18 @@ services:
     environment:
       - PORT=5001
       - FLASK_ENV=development
-      - SQLALCHEMY_DATABASE_URI=sqlite:///limpieza_empresas.db
+      # Note host is 'database' (service name), not localhost
+      - SQLALCHEMY_DATABASE_URI=postgresql://limpieza_user:contraseña_segura_123@database:5432/limpieza_empresas
+      - SECRET_KEY=dev-secret-key-change-in-production
+      # Allow frontend running on localhost (host machine) and inside container
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001
     volumes:
       - ./backend:/app
-      - ./database:/app/database
     depends_on:
       - database
     networks:
       - app-network
-    command: python run.py
+    command: sh -c "while ! nc -z database 5432; do sleep 1; done; echo 'Database ready!'; python run.py"
 
   # Tier 1: Frontend (Presentación)
   frontend:
@@ -42,6 +50,7 @@ services:
     ports:
       - "3001:3001"
     environment:
+      # Browser runs outside docker, so it needs to access backend via localhost:5001
       - REACT_APP_API_URL=http://localhost:5001/api
       - PORT=3001
     volumes:
@@ -57,4 +66,5 @@ networks:
   app-network:
     driver: bridge
 
-
+volumes:
+  postgres_data:

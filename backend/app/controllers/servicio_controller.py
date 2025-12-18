@@ -67,4 +67,3 @@ def delete_servicio(servicio_id):
         return jsonify({'error': str(e)}), 500
 
 
-

@@ -52,4 +52,3 @@ La API estará disponible en `http://localhost:5000`
 Ver README.md principal para la documentación completa de endpoints.
 
 
-

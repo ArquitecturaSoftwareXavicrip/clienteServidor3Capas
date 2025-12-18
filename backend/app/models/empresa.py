@@ -30,4 +30,3 @@ class Empresa(db.Model):
         return f'<Empresa {self.nombre}>'
 
 
-
