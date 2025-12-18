@@ -196,14 +196,25 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
       
+      - name: Configurar Docker Compose
+        run: |
+          # Verificar si docker compose está disponible (plugin de Docker CLI)
+          if docker compose version > /dev/null 2>&1; then
+            echo "✓ Docker Compose plugin disponible"
+          else
+            echo "⚠ Docker Compose plugin no disponible, intentando instalar..."
+            # En GitHub Actions, docker compose debería estar disponible por defecto
+            exit 1
+          fi
+      
       - name: Validar docker-compose.yml
         run: |
-          docker-compose config
+          docker compose config
           echo "✓ docker-compose.yml es válido"
       
       - name: Verificar servicios definidos
         run: |
-          docker-compose config --services
+          docker compose config --services
           echo "✓ Servicios definidos correctamente"
 
   # Job 6: Resumen y notificación
