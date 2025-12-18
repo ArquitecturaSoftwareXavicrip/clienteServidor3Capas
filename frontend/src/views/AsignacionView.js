@@ -49,7 +49,7 @@ const AsignacionView = () => {
             setError(null);
         } catch (err) {
             setError('Error al cargar datos. Asegúrate de que todos los recursos (contratos/servicios/empleados) existan.');
-            console.error(err);
+            // console.error(err);
         } finally {
             setLoading(false);
         }
