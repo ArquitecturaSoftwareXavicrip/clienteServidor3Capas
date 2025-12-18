@@ -11,6 +11,8 @@ from app.controllers.empresa_controller import empresa_bp
 from app.controllers.servicio_controller import servicio_bp
 from app.controllers.contrato_controller import contrato_bp
 from app.controllers.empleado_controller import empleado_bp
+from app.controllers.espacio_controller import espacio_bp
+from app.controllers.asignacion_controller import asignacion_bp
 
 # Cargar variables de entorno desde archivo .env
 load_dotenv()
@@ -41,6 +43,8 @@ def create_app():
     app.register_blueprint(servicio_bp)
     app.register_blueprint(contrato_bp)
     app.register_blueprint(empleado_bp)
+    app.register_blueprint(espacio_bp)
+    app.register_blueprint(asignacion_bp)
     
     @app.route('/')
     def index():

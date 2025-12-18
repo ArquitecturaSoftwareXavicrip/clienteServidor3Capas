@@ -49,6 +49,25 @@ export const empleadosAPI = {
   delete: (id) => api.delete(`/empleados/${id}`),
 };
 
+// Espacios API
+export const espaciosAPI = {
+  getAll: () => api.get('/espacios'),
+  getByEmpresa: (empresaId) => api.get(`/espacios?empresa_id=${empresaId}`),
+  getById: (id) => api.get(`/espacios/${id}`),
+  create: (data) => api.post('/espacios', data),
+  update: (id, data) => api.put(`/espacios/${id}`, data),
+  delete: (id) => api.delete(`/espacios/${id}`),
+};
+
+// Asignaciones API
+export const asignacionesAPI = {
+  getAll: () => api.get('/asignaciones'),
+  getById: (id) => api.get(`/asignaciones/${id}`),
+  create: (data) => api.post('/asignaciones', data),
+  update: (id, data) => api.put(`/asignaciones/${id}`, data),
+  delete: (id) => api.delete(`/asignaciones/${id}`),
+};
+
 export default api;
 
 
