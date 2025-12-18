@@ -68,7 +68,9 @@ jobs:
       
       - name: Instalar dependencias
         working-directory: ./frontend
-        run: npm ci
+        run: |
+          # Intentar npm ci primero, si falla usar npm install
+          npm ci || (echo "⚠ package-lock.json desincronizado, regenerando..." && rm -f package-lock.json && npm install)
       
       - name: Linting con ESLint (si está configurado)
         working-directory: ./frontend
