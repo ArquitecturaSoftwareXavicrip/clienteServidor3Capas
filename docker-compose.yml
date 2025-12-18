@@ -9,8 +9,8 @@ services:
   #     - ./database:/data
   #   networks:
   #     - app-network
-  #   # Nota: SQLite no requiere un contenedor separado, pero se incluye para demostrar la separación de tiers
-  #   # En producción, usar PostgreSQL o MySQL
+    # Nota: SQLite no requiere un contenedor separado, pero se incluye para demostrar la separación de tiers
+    # En producción, usar PostgreSQL o MySQL
 
   # Tier 2: Backend (Lógica de Negocio)
   backend:

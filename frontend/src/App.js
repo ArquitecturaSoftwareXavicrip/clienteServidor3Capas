@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import EmpresaView from './views/EmpresaView';
 import ServicioView from './views/ServicioView';
 import ContratoView from './views/ContratoView';
+import PrestamoView from './views/PrestamoView';
+
 import './App.css';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         return <ServicioView />;
       case 'contratos':
         return <ContratoView />;
+      case 'prestamos':
+        return <PrestamoView />;
       default:
         return <EmpresaView />;
     }
@@ -47,6 +51,12 @@ function App() {
             onClick={() => setCurrentView('contratos')}
           >
             Contratos
+          </button>
+          <button 
+            className={currentView === 'prestamos' ? 'active' : ''} 
+            onClick={() => setCurrentView('prestamos')}
+          >
+            Préstamos Equipos
           </button>
         </div>
       </div>
