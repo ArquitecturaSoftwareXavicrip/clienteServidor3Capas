@@ -40,6 +40,16 @@ export const contratosAPI = {
   delete: (id) => api.delete(`/contratos/${id}`),
 };
 
+// 
+
+export const prestamosAPI = {
+  getAll: () => api.get('/prestamos'),
+  getById: (id) => api.get(`/prestamos/${id}`),
+  create: (data) => api.post('/prestamos', data),
+  update: (id, data) => api.put(`/prestamos/${id}`, data),
+  delete: (id) => api.delete(`/prestamos/${id}`),
+};
+
 export default api;
 
 

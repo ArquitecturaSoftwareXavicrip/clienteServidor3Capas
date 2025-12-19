@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  # Tier 3: Base de Datos
-  database:
-    image: sqlite:latest
-    container_name: limpieza_db
-    volumes:
-      - ./database:/data
-    networks:
-      - app-network
+  # # Tier 3: Base de Datos
+  # database:
+  #   image: sqlite:latest
+  #   container_name: limpieza_db
+  #   volumes:
+  #     - ./database:/data
+  #   networks:
+  #     - app-network
     # Nota: SQLite no requiere un contenedor separado, pero se incluye para demostrar la separación de tiers
     # En producción, usar PostgreSQL o MySQL
 
@@ -27,8 +27,8 @@ services:
     volumes:
       - ./backend:/app
       - ./database:/app/database
-    depends_on:
-      - database
+    # depends_on:
+    #   - database
     networks:
       - app-network
     command: python run.py
