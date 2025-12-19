@@ -1,3 +1,4 @@
+
 -- Esquema de base de datos - Tier 3: Acceso a Datos
 -- Este archivo es de referencia. La base de datos se crea automáticamente con SQLAlchemy
 
@@ -32,4 +33,4 @@ CREATE TABLE IF NOT EXISTS contratos (
     FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE
 );
 
-
+-- Tabla de Accidente
