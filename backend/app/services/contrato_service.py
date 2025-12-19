@@ -120,3 +120,4 @@ class ContratoService:
         return ContratoRepository.delete(contrato_id)
 
 
+

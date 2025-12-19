@@ -67,3 +67,4 @@ def delete_empresa(empresa_id):
         return jsonify({'error': str(e)}), 500
 
 
+

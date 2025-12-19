@@ -34,3 +34,4 @@ class Contrato(db.Model):
         return f'<Contrato {self.id} - Empresa: {self.empresa_id}, Servicio: {self.servicio_id}>'
 
 
+
