@@ -1,4 +1,4 @@
-# Documentación de Arquitectura
+# Documentación de Arquitectura -JA
 
 ## Arquitectura Cliente-Servidor y 3 Capas
 
