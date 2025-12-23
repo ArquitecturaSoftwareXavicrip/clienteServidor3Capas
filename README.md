@@ -70,6 +70,15 @@ arqCS-NCapas/
 3. **Contrato**: Relación entre Empresa y Servicio
    - id, empresa_id, servicio_id, fecha_inicio, fecha_fin, estado, precio_final
 
+4. **Contrato**: Relación entre Empresa y Servicio
+   - id, empresa_id, servicio_id, fecha_inicio, fecha_fin, estado, precio_final
+
+5. **Permiso**: Solicitudes de vacaciones de empleados
+   - id, empleado, tipo, fecha_inicio, fecha_fin, dias_solicitados, estado, observaciones
+
+6. **Empleado**: Personal de la empresa de limpieza
+   - id, nombre, apellido, email, telefono, cargo
+
 ## Requisitos
 
 ### Para Desarrollo Local
@@ -81,9 +90,11 @@ arqCS-NCapas/
 - **Docker** 20.10+
 - **Docker Compose** 1.29+ (o Docker Compose plugin)
 
+### Para Despliegue con PostgreSQL
+- **PostgreSQL** 12+ (recomendado para producción y despliegue en 3 nodos)
+
 ### Opcional
 - **Git** para clonar el repositorio
-- **PostgreSQL** o **MySQL** para producción (en lugar de SQLite)
 
 ## Instalación y Ejecución
 
@@ -154,6 +165,10 @@ El frontend estará disponible en `http://localhost:3001`
 
 **Nota:** Los puertos 5000 y 3000 pueden estar ocupados en macOS (AirPlay Receiver y otros servicios). Por defecto, la aplicación usa los puertos 5001 y 3001.
 
+## Migración a PostgreSQL
+
+El proyecto soporta PostgreSQL para producción. Ver `guiaDespliegue.md` para instrucciones completas.
+
 ## API Endpoints
 
 ### Empresas
@@ -176,6 +191,23 @@ El frontend estará disponible en `http://localhost:3001`
 - `POST /api/contratos` - Crear nuevo contrato
 - `PUT /api/contratos/<id>` - Actualizar contrato
 - `DELETE /api/contratos/<id>` - Eliminar contrato
+
+### Permisos (Vacaciones)
+- `GET /api/permisos` - Listar todos los permisos
+- `GET /api/permisos?estado=<estado>` - Filtrar permisos por estado
+- `GET /api/permisos/<id>` - Obtener permiso por ID
+- `POST /api/permisos` - Crear nuevo permiso
+- `PUT /api/permisos/<id>` - Actualizar permiso
+- `DELETE /api/permisos/<id>` - Eliminar permiso
+- `POST /api/permisos/<id>/aprobar` - Aprobar permiso
+- `POST /api/permisos/<id>/rechazar` - Rechazar permiso
+
+### Empleados
+- `GET /api/empleados` - Listar todos los empleados
+- `GET /api/empleados/<id>` - Obtener empleado por ID
+- `POST /api/empleados` - Crear nuevo empleado
+- `PUT /api/empleados/<id>` - Actualizar empleado
+- `DELETE /api/empleados/<id>` - Eliminar empleado
 
 ## CI/CD
 

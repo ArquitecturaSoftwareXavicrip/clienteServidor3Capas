@@ -40,6 +40,27 @@ export const contratosAPI = {
   delete: (id) => api.delete(`/contratos/${id}`),
 };
 
+// Permisos API
+export const permisosAPI = {
+  getAll: () => api.get('/permisos'),
+  getById: (id) => api.get(`/permisos/${id}`),
+  getByEstado: (estado) => api.get(`/permisos?estado=${estado}`),
+  create: (data) => api.post('/permisos', data),
+  update: (id, data) => api.put(`/permisos/${id}`, data),
+  delete: (id) => api.delete(`/permisos/${id}`),
+  aprobar: (id, observaciones) => api.post(`/permisos/${id}/aprobar`, { observaciones }),
+  rechazar: (id, observaciones) => api.post(`/permisos/${id}/rechazar`, { observaciones }),
+};
+
+// Empleados API
+export const empleadosAPI = {
+  getAll: () => api.get('/empleados'),
+  getById: (id) => api.get(`/empleados/${id}`),
+  create: (data) => api.post('/empleados', data),
+  update: (id, data) => api.put(`/empleados/${id}`, data),
+  delete: (id) => api.delete(`/empleados/${id}`),
+};
+
 export default api;
 
 
