@@ -15,6 +15,7 @@ const EmpleadoView = () => {
     cargo: '',
   });
 
+  useEffect(() => { loadEmpleados(); }, []);
   useEffect(() => {
     loadEmpleados();
   }, []);
@@ -22,42 +23,30 @@ const EmpleadoView = () => {
   const loadEmpleados = async () => {
     try {
       setLoading(true);
-      const response = await empleadosAPI.getAll();
-      setEmpleados(response.data);
+      const res = await empleadosAPI.getAll();
+      setEmpleados(res.data || []);
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al cargar empleados');
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.error || 'Error cargando empleados');
+    } finally { setLoading(false); }
   };
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setError(null);
-      setSuccess(null);
-      
+      setError(null); setSuccess(null);
       if (editingId) {
         await empleadosAPI.update(editingId, formData);
-        setSuccess('Empleado actualizado correctamente');
+        setSuccess('Empleado actualizado');
       } else {
         await empleadosAPI.create(formData);
-        setSuccess('Empleado creado correctamente');
+        setSuccess('Empleado creado');
       }
-      
       resetForm();
       loadEmpleados();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Error al guardar empleado');
-    }
+    } catch (err) { setError(err.response?.data?.error || 'Error guardando'); }
   };
 
   const handleEdit = (empleado) => {
@@ -73,108 +62,45 @@ const EmpleadoView = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este empleado?')) {
-      return;
-    }
-    
-    try {
-      setError(null);
-      await empleadosAPI.delete(id);
-      setSuccess('Empleado eliminado correctamente');
-      loadEmpleados();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Error al eliminar empleado');
-    }
+    if (!window.confirm('Eliminar empleado?')) return;
+    try { await empleadosAPI.delete(id); setSuccess('Empleado eliminado'); loadEmpleados(); }
+    catch (err) { setError(err.response?.data?.error || 'Error eliminando'); }
   };
 
-  const resetForm = () => {
-    setEditingId(null);
-    setFormData({
-      nombre: '',
-      apellido: '',
-      email: '',
-      telefono: '',
-      cargo: '',
-    });
-  };
+  const resetForm = () => { setEditingId(null); setFormData({ nombre:'', apellido:'', email:'', telefono:'', cargo:'' }); };
 
-  if (loading) {
-    return <div className="loading">Cargando empleados...</div>;
-  }
+  if (loading) return <div>Cargando empleados...</div>;
 
   return (
     <div className="container">
       <div className="card">
         <h2>{editingId ? 'Editar Empleado' : 'Nuevo Empleado'}</h2>
-        
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
-        
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div>
             <label>Nombre:</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleInputChange}
-              required
-            />
+            <input name="nombre" value={formData.nombre} onChange={handleInputChange} required />
           </div>
-          
-          <div className="form-group">
+          <div>
             <label>Apellido:</label>
-            <input
-              type="text"
-              name="apellido"
-              value={formData.apellido}
-              onChange={handleInputChange}
-              required
-            />
+            <input name="apellido" value={formData.apellido} onChange={handleInputChange} required />
           </div>
-          
-          <div className="form-group">
+          <div>
             <label>Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
+            <input name="email" type="email" value={formData.email} onChange={handleInputChange} required />
           </div>
-          
-          <div className="form-group">
+          <div>
             <label>Teléfono:</label>
-            <input
-              type="text"
-              name="telefono"
-              value={formData.telefono}
-              onChange={handleInputChange}
-              required
-            />
+            <input name="telefono" value={formData.telefono} onChange={handleInputChange} required />
           </div>
-          
-          <div className="form-group">
+          <div>
             <label>Cargo:</label>
-            <input
-              type="text"
-              name="cargo"
-              value={formData.cargo}
-              onChange={handleInputChange}
-              required
-            />
+            <input name="cargo" value={formData.cargo} onChange={handleInputChange} required />
           </div>
-          
-          <div className="button-group">
-            <button type="submit" className="btn btn-primary">
-              {editingId ? 'Actualizar' : 'Crear'}
-            </button>
-            {editingId && (
-              <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                Cancelar
-              </button>
-            )}
+          <div>
+            <button type="submit">{editingId ? 'Actualizar' : 'Crear'}</button>
+            {editingId && <button type="button" onClick={resetForm}>Cancelar</button>}
           </div>
         </form>
       </div>
@@ -183,46 +109,23 @@ const EmpleadoView = () => {
         <h2>Lista de Empleados</h2>
         <table>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              <th>Email</th>
-              <th>Teléfono</th>
-              <th>Cargo</th>
-              <th>Acciones</th>
-            </tr>
+            <tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Email</th><th>Teléfono</th><th>Cargo</th><th>Acciones</th></tr>
           </thead>
           <tbody>
             {empleados.length === 0 ? (
-              <tr>
-                <td colSpan="7" style={{ textAlign: 'center' }}>
-                  No hay empleados registrados
-                </td>
-              </tr>
+              <tr><td colSpan="7">No hay empleados</td></tr>
             ) : (
-              empleados.map((empleado) => (
-                <tr key={empleado.id}>
-                  <td>{empleado.id}</td>
-                  <td>{empleado.nombre}</td>
-                  <td>{empleado.apellido}</td>
-                  <td>{empleado.email}</td>
-                  <td>{empleado.telefono}</td>
-                  <td>{empleado.cargo}</td>
+              empleados.map(emp => (
+                <tr key={emp.id}>
+                  <td>{emp.id}</td>
+                  <td>{emp.nombre}</td>
+                  <td>{emp.apellido}</td>
+                  <td>{emp.email}</td>
+                  <td>{emp.telefono}</td>
+                  <td>{emp.cargo}</td>
                   <td>
-                    <button
-                      className="btn btn-edit"
-                      onClick={() => handleEdit(empleado)}
-                      style={{ marginRight: '5px' }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(empleado.id)}
-                    >
-                      Eliminar
-                    </button>
+                    <button onClick={() => handleEdit(emp)}>Editar</button>
+                    <button onClick={() => handleDelete(emp.id)}>Eliminar</button>
                   </td>
                 </tr>
               ))
