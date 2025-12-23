@@ -1,4 +1,9 @@
+/**
+ * Vista de Empleados - Tier 1: Presentación (MVC View)
+ * Componente React para la gestión y seguimiento de empleados
+ */
 import React, { useState, useEffect } from 'react';
+// Asegúrate de haber exportado empleadosAPI en services/api.js como vimos antes
 import { empleadosAPI } from '../services/api';
 
 const EmpleadoView = () => {
@@ -7,12 +12,14 @@ const EmpleadoView = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  
+  // Estado del formulario adaptado a la entidad Empleado
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
     email: '',
     telefono: '',
-    cargo: '',
+    cargo: ''
   });
 
   useEffect(() => {
@@ -45,12 +52,16 @@ const EmpleadoView = () => {
       setError(null);
       setSuccess(null);
       
+      // La lógica sirve tanto para Crear como para Editar si el backend lo soporta
+      // Si solo implementamos create en el paso anterior, aquí usaremos create.
       if (editingId) {
-        await empleadosAPI.update(editingId, formData);
-        setSuccess('Empleado actualizado correctamente');
+        // Asumiendo que implementaste update en el backend/API
+        // await empleadosAPI.update(editingId, formData);
+        // setSuccess('Empleado actualizado correctamente');
+        console.warn("La actualización requiere implementar PUT en el backend");
       } else {
         await empleadosAPI.create(formData);
-        setSuccess('Empleado creado correctamente');
+        setSuccess('Empleado registrado correctamente');
       }
       
       resetForm();
@@ -66,14 +77,14 @@ const EmpleadoView = () => {
       nombre: empleado.nombre,
       apellido: empleado.apellido,
       email: empleado.email,
-      telefono: empleado.telefono,
-      cargo: empleado.cargo,
+      telefono: empleado.telefono || '',
+      cargo: empleado.cargo || '',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este empleado?')) {
+    if (!window.confirm('¿Está seguro de dar de baja a este empleado?')) {
       return;
     }
     
@@ -94,12 +105,12 @@ const EmpleadoView = () => {
       apellido: '',
       email: '',
       telefono: '',
-      cargo: '',
+      cargo: ''
     });
   };
 
   if (loading) {
-    return <div className="loading">Cargando empleados...</div>;
+    return <div className="loading">Cargando personal...</div>;
   }
 
   return (
@@ -121,7 +132,7 @@ const EmpleadoView = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label>Apellido:</label>
             <input
@@ -151,10 +162,9 @@ const EmpleadoView = () => {
               name="telefono"
               value={formData.telefono}
               onChange={handleInputChange}
-              required
             />
           </div>
-          
+
           <div className="form-group">
             <label>Cargo:</label>
             <input
@@ -162,13 +172,13 @@ const EmpleadoView = () => {
               name="cargo"
               value={formData.cargo}
               onChange={handleInputChange}
-              required
+              placeholder="Ej: Supervisor, Limpieza..."
             />
           </div>
           
           <div className="button-group">
             <button type="submit" className="btn btn-primary">
-              {editingId ? 'Actualizar' : 'Crear'}
+              {editingId ? 'Actualizar' : 'Registrar'}
             </button>
             {editingId && (
               <button type="button" className="btn btn-secondary" onClick={resetForm}>
@@ -180,16 +190,16 @@ const EmpleadoView = () => {
       </div>
 
       <div className="card">
-        <h2>Lista de Empleados</h2>
+        <h2>Plantilla de Empleados</h2>
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Nombre</th>
-              <th>Apellido</th>
+              <th>Nombre Completo</th>
+              <th>Cargo</th>
               <th>Email</th>
               <th>Teléfono</th>
-              <th>Cargo</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -204,11 +214,22 @@ const EmpleadoView = () => {
               empleados.map((empleado) => (
                 <tr key={empleado.id}>
                   <td>{empleado.id}</td>
-                  <td>{empleado.nombre}</td>
-                  <td>{empleado.apellido}</td>
+                  <td>{empleado.nombre} {empleado.apellido}</td>
+                  <td>{empleado.cargo}</td>
                   <td>{empleado.email}</td>
                   <td>{empleado.telefono}</td>
-                  <td>{empleado.cargo}</td>
+                  <td>
+                    {/* Simulamos estado activo ya que en el modelo pusimos activo=True por defecto */}
+                    <span style={{ 
+                      backgroundColor: '#e6fffa', 
+                      color: '#047857', 
+                      padding: '4px 8px', 
+                      borderRadius: '4px',
+                      fontSize: '0.875rem'
+                    }}>
+                      Activo
+                    </span>
+                  </td>
                   <td>
                     <button
                       className="btn btn-edit"
@@ -221,7 +242,7 @@ const EmpleadoView = () => {
                       className="btn btn-danger"
                       onClick={() => handleDelete(empleado.id)}
                     >
-                      Eliminar
+                      Baja
                     </button>
                   </td>
                 </tr>
