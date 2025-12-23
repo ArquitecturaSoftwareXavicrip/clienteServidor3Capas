@@ -16,6 +16,9 @@ const EmpleadoView = () => {
   });
 
   useEffect(() => { loadEmpleados(); }, []);
+  useEffect(() => {
+    loadEmpleados();
+  }, []);
 
   const loadEmpleados = async () => {
     try {
