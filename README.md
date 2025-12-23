@@ -70,10 +70,13 @@ arqCS-NCapas/
 3. **Contrato**: Relación entre Empresa y Servicio
    - id, empresa_id, servicio_id, fecha_inicio, fecha_fin, estado, precio_final
 
-4. **Permiso**: Solicitudes de vacaciones de empleados
+4. **Contrato**: Relación entre Empresa y Servicio
+   - id, empresa_id, servicio_id, fecha_inicio, fecha_fin, estado, precio_final
+
+5. **Permiso**: Solicitudes de vacaciones de empleados
    - id, empleado, tipo, fecha_inicio, fecha_fin, dias_solicitados, estado, observaciones
 
-5. **Empleado**: Personal de la empresa de limpieza
+6. **Empleado**: Personal de la empresa de limpieza
    - id, nombre, apellido, email, telefono, cargo
 
 ## Requisitos
@@ -162,40 +165,9 @@ El frontend estará disponible en `http://localhost:3001`
 
 **Nota:** Los puertos 5000 y 3000 pueden estar ocupados en macOS (AirPlay Receiver y otros servicios). Por defecto, la aplicación usa los puertos 5001 y 3001.
 
-## Migración a PostgreSQL y Despliegue en 3 Nodos
+## Migración a PostgreSQL
 
-El proyecto soporta PostgreSQL para producción y puede desplegarse en 3 nodos físicos diferentes:
-
-### Configuración PostgreSQL
-
-```bash
-# 1. Crear base de datos
-sudo -u postgres psql -c "CREATE DATABASE limpieza_empresas;"
-
-# 2. Crear archivo backend/.env
-SQLALCHEMY_DATABASE_URI=postgresql://postgres@localhost:5432/limpieza_empresas
-
-# 3. Instalar dependencia
-pip install psycopg2-binary
-
-# 4. Crear tablas
-cd database
-sudo -u postgres psql limpieza_empresas -f schema.sql
-```
-
-**Ver guías completas:**
-- 📖 [Configuración PostgreSQL](backend/CONFIG_POSTGRESQL.md)
-- 🏗️ [Despliegue en 3 Nodos](DESPLIEGUE_3_NODOS_PERMISOS.md)
-- 🚀 [Migración Completa](MIGRACION_POSTGRESQL_3_NODOS.md)
-
-### Despliegue en 3 Nodos
-
-La aplicación puede desplegarse en 3 nodos físicos diferentes:
-- **Nodo 1**: PostgreSQL (Tier 3 - Datos)
-- **Nodo 2**: Flask Backend (Tier 2 - Lógica de Negocio)
-- **Nodo 3**: React Frontend (Tier 1 - Presentación)
-
-**Ver:** [DESPLIEGUE_3_NODOS_PERMISOS.md](DESPLIEGUE_3_NODOS_PERMISOS.md)
+El proyecto soporta PostgreSQL para producción. Ver `guiaDespliegue.md` para instrucciones completas.
 
 ## API Endpoints
 
@@ -255,7 +227,6 @@ El proyecto incluye documentación completa para estudiantes y desarrolladores:
 - **[Guía de Despliegue Local en 3 Nodos](guiaDespliegueLocal.md)**: Cómo desplegar cada capa en un nodo físico diferente, demostrando la separación física de tiers
 - **[Guía de Uso de Ramas en GitHub](guiaUsoRamasGithub.md)**: Cómo trabajar con ramas de Git/GitHub para agregar nuevas funcionalidades de manera colaborativa
 - **[Documentación de Arquitectura](ARQUITECTURA.md)**: Detalles técnicos sobre la arquitectura cliente-servidor y 3 capas
-- **[Módulo de Permisos](MODULO_PERMISOS.md)**: Documentación completa del módulo de gestión de permisos de vacaciones
 
 ## Características
 

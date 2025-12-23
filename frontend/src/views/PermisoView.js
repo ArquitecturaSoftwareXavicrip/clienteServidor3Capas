@@ -2,7 +2,7 @@
  * Vista de Permisos - Tier 1: Presentación (MVC View)
  * Componente React que representa la vista de gestión de permisos de vacaciones
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { permisosAPI } from '../services/api';
 
 const PermisoView = () => {
@@ -22,11 +22,7 @@ const PermisoView = () => {
     observaciones: '',
   });
 
-  useEffect(() => {
-    loadPermisos();
-  }, [filtroEstado]);
-
-  const loadPermisos = async () => {
+  const loadPermisos = useCallback(async () => {
     try {
       setLoading(true);
       let response;
@@ -42,7 +38,11 @@ const PermisoView = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filtroEstado]);
+
+  useEffect(() => {
+    loadPermisos();
+  }, [loadPermisos]);
 
   const handleInputChange = (e) => {
     setFormData({
