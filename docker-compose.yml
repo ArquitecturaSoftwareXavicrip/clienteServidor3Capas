@@ -27,12 +27,12 @@ services:
       dockerfile: Dockerfile
     container_name: limpieza_backend
     ports:
-      - "5001:5001"
+      - "0.0.0.0:5001:5001"
     environment:
       - PORT=5001
       - FLASK_ENV=development
       - SQLALCHEMY_DATABASE_URI=postgresql://postgres@database:5432/limpieza_empresas
-      - CORS_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
+      - CORS_ORIGINS=*
     volumes:
       - ./backend:/app
       - ./database:/app/database
@@ -50,9 +50,9 @@ services:
       dockerfile: Dockerfile
     container_name: limpieza_frontend
     ports:
-      - "3001:3001"
+      - "0.0.0.0:3001:3001"
     environment:
-      - REACT_APP_API_URL=http://localhost:5001/api
+      - REACT_APP_API_URL=http://192.168.56.1:5001/api
       - PORT=3001
       - HOST=0.0.0.0
       - WATCHPACK_POLLING=true

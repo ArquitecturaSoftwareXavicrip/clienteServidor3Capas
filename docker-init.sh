@@ -2,12 +2,12 @@
 # Script para inicializar datos en Docker
 
 echo "Esperando a que PostgreSQL esté listo..."
-sleep 5
+sleep 10
 
 echo "Cargando datos de ejemplo..."
-docker exec limpieza_backend python /app/../database/init_db.py
-docker exec limpieza_backend python /app/../database/init_permisos.py
+docker exec limpieza_backend python init_all_data.py
 
+echo ""
 echo "✅ Datos cargados correctamente"
 echo ""
 echo "🚀 Aplicación lista:"
