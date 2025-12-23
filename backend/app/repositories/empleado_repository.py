@@ -55,3 +55,5 @@ class EmpleadoRepository:
         db.session.delete(empleado)
         db.session.commit()
         return True
+
+# Commit metadata: repository created as part of feature/franklin
