@@ -22,7 +22,7 @@ export const empresasAPI = {
   delete: (id) => api.delete(`/empresas/${id}`),
 };
 
-// Servicios API
+// Servicios API (operaciones CRUD básicas)
 export const serviciosAPI = {
   getAll: () => api.get('/servicios'),
   getById: (id) => api.get(`/servicios/${id}`),
@@ -40,11 +40,6 @@ export const contratosAPI = {
   delete: (id) => api.delete(`/contratos/${id}`),
 };
 
-export default api;
-
-
-// Agregar al final del archivo, antes de export default api;
-
 // Empleados API
 export const empleadosAPI = {
   getAll: () => api.get('/empleados'),
@@ -53,3 +48,20 @@ export const empleadosAPI = {
   update: (id, data) => api.put(`/empleados/${id}`, data),
   delete: (id) => api.delete(`/empleados/${id}`),
 };
+
+// ServicioService: incluye métodos CRUD + asignar/desasignar empleado
+export const servicioService = {
+  getAll: () => api.get('/servicios'),
+  getById: (id) => api.get(`/servicios/${id}`),
+  create: (data) => api.post('/servicios', data),
+  update: (id, data) => api.put(`/servicios/${id}`, data),
+  delete: (id) => api.delete(`/servicios/${id}`),
+
+  asignarEmpleado: (servicioId, empleadoId) =>
+    api.post(`/servicios/${servicioId}/asignar`, { empleado_id: empleadoId }),
+
+  desasignarEmpleado: (servicioId, empleadoId) =>
+    api.post(`/servicios/${servicioId}/desasignar`, { empleado_id: empleadoId }),
+};
+
+export default api;
