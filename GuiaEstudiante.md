@@ -823,6 +823,88 @@ Ver el archivo `README.md` para instrucciones de despliegue con Docker.
 
 ---
 
+## Módulos Adicionales: Empleados y Facturas
+
+El proyecto incluye dos módulos adicionales más allá del ejemplo básico de Empresa-Servicio-Contrato:
+
+### Módulo de Empleados
+
+**Descripción**: Gestión del personal que realiza los servicios de limpieza.
+
+**Campos**:
+- `id`: Identificador único
+- `nombre`: Nombre del empleado
+- `apellido`: Apellido del empleado
+- `email`: Correo electrónico
+- `telefono`: Número de teléfono
+- `cargo`: Puesto o cargo del empleado
+
+**Endpoints**:
+- `GET /api/empleados` - Obtener todos los empleados
+- `GET /api/empleados/<id>` - Obtener empleado por ID
+- `POST /api/empleados` - Crear nuevo empleado
+- `PUT /api/empleados/<id>` - Actualizar empleado
+- `DELETE /api/empleados/<id>` - Eliminar empleado
+
+**Validaciones**:
+- Nombre y apellido son requeridos
+- Email debe ser válido (contener @)
+- Teléfono es requerido
+- Cargo es requerido
+
+### Módulo de Facturas
+
+**Descripción**: Gestión de facturas de servicios prestados a empresas.
+
+**Campos**:
+- `id`: Identificador único
+- `empresa_id`: Referencia a la empresa (FK)
+- `empleado_id`: Referencia al empleado que realiza el servicio (FK)
+- `servicio_id`: Referencia al servicio prestado (FK)
+- `fecha_factura`: Fecha de emisión de la factura
+- `fecha_vencimiento`: Fecha de vencimiento del pago
+- `descripcion`: Descripción detallada del servicio
+- `cantidad`: Cantidad de unidades del servicio
+- `precio_unitario`: Precio por unidad
+- `subtotal`: Cantidad × Precio unitario (calculado automáticamente)
+- `impuesto`: Monto del impuesto
+- `total`: Subtotal + Impuesto (calculado automáticamente)
+- `estado`: Estado de la factura (pendiente, pagada, cancelada)
+
+**Endpoints**:
+- `GET /api/facturas` - Obtener todas las facturas
+- `GET /api/facturas/<id>` - Obtener factura por ID
+- `GET /api/facturas/empresa/<empresa_id>` - Obtener facturas de una empresa específica
+- `POST /api/facturas` - Crear nueva factura
+- `PUT /api/facturas/<id>` - Actualizar factura
+- `DELETE /api/facturas/<id>` - Eliminar factura
+
+**Validaciones**:
+- Empresa, empleado y servicio deben existir
+- Descripción es requerida
+- Cantidad debe ser mayor a 0
+- Precio unitario debe ser válido (≥ 0)
+- Fecha de vencimiento es requerida
+- Los totales se calculan automáticamente
+
+**Cálculos Automáticos**:
+- `subtotal = cantidad × precio_unitario`
+- `total = subtotal + impuesto`
+
+### Relaciones entre Módulos
+
+```
+Empresa (1) ──────────────── (N) Factura
+                              |
+                              ├─── empleado_id (FK) → Empleado
+                              ├─── servicio_id (FK) → Servicio
+                              └─── empresa_id (FK) → Empresa
+
+Empleado (1) ──────────────── (N) Factura
+```
+
+---
+
 ## Recursos Adicionales
 
 - [Documentación de Flask](https://flask.palletsprojects.com/)

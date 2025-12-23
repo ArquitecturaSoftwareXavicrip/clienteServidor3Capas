@@ -1,9 +1,9 @@
 -- Esquema de base de datos - Tier 3: Acceso a Datos
--- Este archivo es de referencia. La base de datos se crea automáticamente con SQLAlchemy
+-- Compatible con PostgreSQL
 
 -- Tabla de Empresas
 CREATE TABLE IF NOT EXISTS empresas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     direccion VARCHAR(200) NOT NULL,
     telefono VARCHAR(20) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS empresas (
 
 -- Tabla de Servicios
 CREATE TABLE IF NOT EXISTS servicios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio_base REAL NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS servicios (
 
 -- Tabla de Contratos
 CREATE TABLE IF NOT EXISTS contratos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     empresa_id INTEGER NOT NULL,
     servicio_id INTEGER NOT NULL,
     fecha_inicio DATE NOT NULL,

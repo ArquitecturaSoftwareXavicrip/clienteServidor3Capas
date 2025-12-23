@@ -4,10 +4,16 @@
  */
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+// Lee la URL de la API en tiempo de ejecución desde window.API_URL (definido en public/config.js)
+const getApiUrl = () => {
+  if (typeof window !== 'undefined' && window.API_URL) {
+    return window.API_URL;
+  }
+  return 'http://localhost:5001/api';
+};
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,6 +44,25 @@ export const contratosAPI = {
   create: (data) => api.post('/contratos', data),
   update: (id, data) => api.put(`/contratos/${id}`, data),
   delete: (id) => api.delete(`/contratos/${id}`),
+};
+
+// Empleados API
+export const empleadosAPI = {
+  getAll: () => api.get('/empleados'),
+  getById: (id) => api.get(`/empleados/${id}`),
+  create: (data) => api.post('/empleados', data),
+  update: (id, data) => api.put(`/empleados/${id}`, data),
+  delete: (id) => api.delete(`/empleados/${id}`),
+};
+
+// Facturas API
+export const facturasAPI = {
+  getAll: () => api.get('/facturas'),
+  getById: (id) => api.get(`/facturas/${id}`),
+  getByEmpresa: (empresaId) => api.get(`/facturas/empresa/${empresaId}`),
+  create: (data) => api.post('/facturas', data),
+  update: (id, data) => api.put(`/facturas/${id}`, data),
+  delete: (id) => api.delete(`/facturas/${id}`),
 };
 
 export default api;

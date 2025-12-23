@@ -1,16 +1,26 @@
 version: '3.8'
 
 services:
-  # Tier 3: Base de Datos
+  # Tier 3: Base de Datos (PostgreSQL)
   database:
-    image: sqlite:latest
+    image: postgres:15-alpine
     container_name: limpieza_db
+    environment:
+      POSTGRES_DB: limpieza_empresas
+      POSTGRES_USER: limpieza_user
+      POSTGRES_PASSWORD: contraseña_segura_123
+    ports:
+      - "5433:5432"
     volumes:
-      - ./database:/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - app-network
-    # Nota: SQLite no requiere un contenedor separado, pero se incluye para demostrar la separación de tiers
-    # En producción, usar PostgreSQL o MySQL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U limpieza_user -d limpieza_empresas"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Tier 2: Backend (Lógica de Negocio)
   backend:
@@ -23,12 +33,14 @@ services:
     environment:
       - PORT=5001
       - FLASK_ENV=development
-      - SQLALCHEMY_DATABASE_URI=sqlite:///limpieza_empresas.db
+      - SQLALCHEMY_DATABASE_URI=postgresql://limpieza_user:contraseña_segura_123@database:5432/limpieza_empresas
+      - CORS_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
     volumes:
       - ./backend:/app
       - ./database:/app/database
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - app-network
     command: python run.py
@@ -52,6 +64,9 @@ services:
     networks:
       - app-network
     command: npm start
+
+volumes:
+  postgres_data:
 
 networks:
   app-network:

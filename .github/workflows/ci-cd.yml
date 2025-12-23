@@ -174,11 +174,15 @@ jobs:
       
       - name: Inicializar base de datos
         working-directory: ./backend
+        env:
+          SQLALCHEMY_DATABASE_URI: sqlite:///test_limpieza.db
         run: |
           python -c "from app import create_app; app = create_app(); print('✓ Base de datos inicializada')"
       
       - name: Verificar endpoints de API
         working-directory: ./backend
+        env:
+          SQLALCHEMY_DATABASE_URI: sqlite:///test_limpieza.db
         run: |
           python run.py &
           sleep 5

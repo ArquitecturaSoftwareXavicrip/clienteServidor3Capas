@@ -70,6 +70,12 @@ arqCS-NCapas/
 3. **Contrato**: Relación entre Empresa y Servicio
    - id, empresa_id, servicio_id, fecha_inicio, fecha_fin, estado, precio_final
 
+4. **Empleado**: Personal que realiza los servicios
+   - id, nombre, apellido, email, telefono, cargo
+
+5. **Factura**: Documento de facturación de servicios
+   - id, empresa_id, empleado_id, servicio_id, fecha_factura, fecha_vencimiento, descripcion, cantidad, precio_unitario, subtotal, impuesto, total, estado
+
 ## Requisitos
 
 ### Para Desarrollo Local
@@ -176,6 +182,21 @@ El frontend estará disponible en `http://localhost:3001`
 - `POST /api/contratos` - Crear nuevo contrato
 - `PUT /api/contratos/<id>` - Actualizar contrato
 - `DELETE /api/contratos/<id>` - Eliminar contrato
+
+### Empleados
+- `GET /api/empleados` - Listar todos los empleados
+- `GET /api/empleados/<id>` - Obtener empleado por ID
+- `POST /api/empleados` - Crear nuevo empleado
+- `PUT /api/empleados/<id>` - Actualizar empleado
+- `DELETE /api/empleados/<id>` - Eliminar empleado
+
+### Facturas
+- `GET /api/facturas` - Listar todas las facturas
+- `GET /api/facturas/<id>` - Obtener factura por ID
+- `GET /api/facturas/empresa/<empresa_id>` - Obtener facturas de una empresa
+- `POST /api/facturas` - Crear nueva factura
+- `PUT /api/facturas/<id>` - Actualizar factura
+- `DELETE /api/facturas/<id>` - Eliminar factura
 
 ## CI/CD
 
