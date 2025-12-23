@@ -4,7 +4,7 @@ Encapsula todas las operaciones de acceso a datos para Servicio
 """
 from app.config.database import db
 from app.models.servicio import Servicio
-
+from app.models.empleado import Empleado
 class ServicioRepository:
     """Repositorio para operaciones CRUD de Servicio"""
     
@@ -56,6 +56,29 @@ class ServicioRepository:
         db.session.delete(servicio)
         db.session.commit()
         return True
+    
+    
+    @staticmethod
+    def asignar_empleado(servicio_id, empleado_id):
+        servicio = Servicio.query.get(servicio_id)
+        empleado = Empleado.query.get(empleado_id)
+        
+        if servicio and empleado:
+            if empleado not in servicio.empleados:
+                servicio.empleados.append(empleado)
+                db.session.commit()
+            return servicio
+        return None
 
-
+    @staticmethod
+    def desasignar_empleado(servicio_id, empleado_id):
+            servicio = Servicio.query.get(servicio_id)
+            empleado = Empleado.query.get(empleado_id)
+            
+            if servicio and empleado:
+                if empleado in servicio.empleados:
+                    servicio.empleados.remove(empleado)
+                    db.session.commit()
+                return servicio
+            return None
 

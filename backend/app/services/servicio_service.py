@@ -68,5 +68,13 @@ class ServicioService:
         
         return ServicioRepository.delete(servicio_id)
 
+    @staticmethod
+    def asignar_empleado(servicio_id, empleado_id):
+        # Aquí podrías agregar validaciones de negocio adicionales
+        # Ejemplo: Verificar si el empleado está activo o tiene capacidad
+        return ServicioRepository.asignar_empleado(servicio_id, empleado_id)
 
+    @staticmethod
+    def desasignar_empleado(servicio_id, empleado_id):
+        return ServicioRepository.desasignar_empleado(servicio_id, empleado_id)
 

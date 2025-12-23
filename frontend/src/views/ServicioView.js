@@ -1,16 +1,24 @@
-/**
- * Vista de Servicios - Tier 1: Presentación (MVC View)
- * Componente React que representa la vista de gestión de servicios
+/*
+ * ServicioView.jsx (corregido)
+ * Vista de Servicios + Asignación de Empleados
+ * - Un único componente que maneja creación/edición/eliminación de servicios
+ * - Gestión de asignación/desasignación de empleados al editar un servicio
+ * - Manejo seguro de valores nulos/indefinidos y de inputs numéricos
  */
-import React, { useState, useEffect } from 'react';
-import { serviciosAPI } from '../services/api';
+
+import React, { useEffect, useState } from 'react';
+import { servicioService, empleadosAPI } from '../services/api';
 
 const ServicioView = () => {
   const [servicios, setServicios] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
   const [editingId, setEditingId] = useState(null);
+  const [assignedEmployeeIds, setAssignedEmployeeIds] = useState([]);
+
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
@@ -19,27 +27,38 @@ const ServicioView = () => {
   });
 
   useEffect(() => {
-    loadServicios();
+    loadData();
   }, []);
 
-  const loadServicios = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const response = await serviciosAPI.getAll();
-      setServicios(response.data);
       setError(null);
+      const [serviciosRes, empleadosRes] = await Promise.all([
+        servicioService.getAll(),
+        empleadosAPI.getAll(),
+      ]);
+
+      setServicios(serviciosRes?.data || []);
+      setEmpleados(empleadosRes?.data || []);
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al cargar servicios');
+      setError(err?.response?.data?.error || 'Error al cargar datos');
     } finally {
       setLoading(false);
     }
   };
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setAssignedEmployeeIds([]);
+    setFormData({ nombre: '', descripcion: '', precio_base: '', duracion_horas: '' });
+    setError(null);
+    setSuccess(null);
   };
 
   const handleSubmit = async (e) => {
@@ -47,102 +66,131 @@ const ServicioView = () => {
     try {
       setError(null);
       setSuccess(null);
-      
-      const data = {
-        ...formData,
-        precio_base: parseFloat(formData.precio_base),
-        duracion_horas: parseFloat(formData.duracion_horas),
+
+      const payload = {
+        nombre: formData.nombre,
+        descripcion: formData.descripcion || null,
+        // Convertir a número cuando haya valor, sino null
+        precio_base: formData.precio_base === '' ? null : parseFloat(formData.precio_base),
+        duracion_horas: formData.duracion_horas === '' ? null : parseFloat(formData.duracion_horas),
       };
-      
+
       if (editingId) {
-        await serviciosAPI.update(editingId, data);
+        await servicioService.update(editingId, payload);
         setSuccess('Servicio actualizado correctamente');
       } else {
-        await serviciosAPI.create(data);
+        await servicioService.create(payload);
         setSuccess('Servicio creado correctamente');
       }
-      
+
+      // Recargar lista completa para mantener consistencia
+      await loadData();
       resetForm();
-      loadServicios();
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al guardar servicio');
+      setError(err?.response?.data?.error || 'Error al guardar servicio');
     }
   };
 
   const handleEdit = (servicio) => {
     setEditingId(servicio.id);
+
     setFormData({
-      nombre: servicio.nombre,
-      descripcion: servicio.descripcion || '',
-      precio_base: servicio.precio_base.toString(),
-      duracion_horas: servicio.duracion_horas.toString(),
+      nombre: servicio.nombre ?? '',
+      descripcion: servicio.descripcion ?? '',
+      precio_base: servicio.precio_base != null ? String(servicio.precio_base) : '',
+      duracion_horas: servicio.duracion_horas != null ? String(servicio.duracion_horas) : '',
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const currentIds = Array.isArray(servicio.empleados) ? servicio.empleados.map((e) => e.id) : [];
+    setAssignedEmployeeIds(currentIds);
+
+    // Llevar la vista al formulario (solo en cliente)
+    if (typeof window !== 'undefined' && window.scrollTo) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const toggleEmpleado = async (empleadoId) => {
+    if (!editingId) return; // Solo en modo edición
+
+    const isAssigned = assignedEmployeeIds.includes(empleadoId);
+
+    try {
+      setError(null);
+      if (isAssigned) {
+        await servicioService.desasignarEmpleado(editingId, empleadoId);
+        setAssignedEmployeeIds((prev) => prev.filter((id) => id !== empleadoId));
+      } else {
+        await servicioService.asignarEmpleado(editingId, empleadoId);
+        setAssignedEmployeeIds((prev) => [...prev, empleadoId]);
+      }
+
+      // Actualizar la lista principal para reflejar el cambio (simplificado: recargar todo)
+      const srvRes = await servicioService.getAll();
+      setServicios(srvRes?.data || []);
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Error al modificar asignación de empleado');
+    }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este servicio?')) {
-      return;
-    }
-    
+    if (!window.confirm('¿Está seguro de eliminar este servicio?')) return;
+
     try {
       setError(null);
-      await serviciosAPI.delete(id);
+      await servicioService.delete(id);
       setSuccess('Servicio eliminado correctamente');
-      loadServicios();
+      const srvRes = await servicioService.getAll();
+      setServicios(srvRes?.data || []);
+      // Si eliminamos el que estábamos editando, limpiar formulario
+      if (editingId === id) resetForm();
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al eliminar servicio');
+      setError(err?.response?.data?.error || 'Error al eliminar servicio');
     }
   };
 
-  const resetForm = () => {
-    setEditingId(null);
-    setFormData({
-      nombre: '',
-      descripcion: '',
-      precio_base: '',
-      duracion_horas: '',
-    });
+  const formatCurrency = (v) => {
+    if (v == null || Number.isNaN(Number(v))) return '-';
+    try {
+      return `$${Number(v).toFixed(2)}`;
+    } catch {
+      return '-';
+    }
   };
 
-  if (loading) {
-    return <div className="loading">Cargando servicios...</div>;
-  }
+  const formatDuration = (d) => {
+    if (d == null || d === '') return '-';
+    return `${d}h`;
+  };
+
+  if (loading) return <div className="loading">Cargando datos...</div>;
 
   return (
     <div className="container">
       <div className="card">
         <h2>{editingId ? 'Editar Servicio' : 'Nuevo Servicio'}</h2>
-        
-        {error && <div className="error">{error}</div>}
-        {success && <div className="success">{success}</div>}
-        
+
+        {error && <div className="error" role="alert">{error}</div>}
+        {success && <div className="success" role="status">{success}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Nombre:</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleInputChange}
-              required
-            />
+            <label htmlFor="nombre">Nombre:</label>
+            <input id="nombre" name="nombre" type="text" value={formData.nombre} onChange={handleInputChange} required />
           </div>
-          
+
           <div className="form-group">
-            <label>Descripción:</label>
-            <textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleInputChange}
-            />
+            <label htmlFor="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" value={formData.descripcion} onChange={handleInputChange} />
           </div>
-          
+
           <div className="form-group">
-            <label>Precio Base:</label>
+            <label htmlFor="precio_base">Precio Base:</label>
             <input
-              type="number"
+              id="precio_base"
               name="precio_base"
+              type="number"
+              inputMode="decimal"
               value={formData.precio_base}
               onChange={handleInputChange}
               step="0.01"
@@ -150,12 +198,13 @@ const ServicioView = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
-            <label>Duración (horas):</label>
+            <label htmlFor="duracion_horas">Duración (horas):</label>
             <input
-              type="number"
+              id="duracion_horas"
               name="duracion_horas"
+              type="number"
               value={formData.duracion_horas}
               onChange={handleInputChange}
               step="0.5"
@@ -163,62 +212,74 @@ const ServicioView = () => {
               required
             />
           </div>
-          
-          <div className="button-group">
-            <button type="submit" className="btn btn-primary">
-              {editingId ? 'Actualizar' : 'Crear'}
-            </button>
+
+          {editingId && (
+            <div className="form-group" style={{ marginTop: 20, borderTop: '1px solid #eee', paddingTop: 15 }}>
+              <h3>Asignar Empleados</h3>
+              <p className="small-text">Seleccione los empleados que realizan este servicio:</p>
+
+              {empleados.length === 0 ? (
+                <p>No hay empleados registrados.</p>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+                  {empleados.map((empleado) => (
+                    <label key={empleado.id} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 6, border: '1px solid #ddd', borderRadius: 4 }}>
+                      <input
+                        type="checkbox"
+                        checked={assignedEmployeeIds.includes(empleado.id)}
+                        onChange={() => toggleEmpleado(empleado.id)}
+                        style={{ marginRight: 8 }}
+                      />
+                      <span>{empleado.nombre} {empleado.apellido ?? ''}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="button-group" style={{ marginTop: 20 }}>
+            <button type="submit" className="btn btn-primary">{editingId ? 'Actualizar Datos' : 'Crear Servicio'}</button>
             {editingId && (
-              <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                Cancelar
-              </button>
+              <button type="button" className="btn btn-secondary" onClick={resetForm} style={{ marginLeft: 8 }}>Cancelar</button>
             )}
           </div>
         </form>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ marginTop: 16 }}>
         <h2>Lista de Servicios</h2>
-        <table>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
               <th>ID</th>
               <th>Nombre</th>
-              <th>Descripción</th>
               <th>Precio Base</th>
-              <th>Duración (h)</th>
+              <th>Duración</th>
+              <th>Empleados Asignados</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {servicios.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center' }}>
-                  No hay servicios registrados
-                </td>
+                <td colSpan={6} style={{ textAlign: 'center' }}>No hay servicios registrados</td>
               </tr>
             ) : (
               servicios.map((servicio) => (
                 <tr key={servicio.id}>
                   <td>{servicio.id}</td>
                   <td>{servicio.nombre}</td>
-                  <td>{servicio.descripcion || '-'}</td>
-                  <td>${servicio.precio_base.toFixed(2)}</td>
-                  <td>{servicio.duracion_horas}h</td>
+                  <td>{formatCurrency(servicio.precio_base)}</td>
+                  <td>{formatDuration(servicio.duracion_horas)}</td>
                   <td>
-                    <button
-                      className="btn btn-edit"
-                      onClick={() => handleEdit(servicio)}
-                      style={{ marginRight: '5px' }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(servicio.id)}
-                    >
-                      Eliminar
-                    </button>
+                    {Array.isArray(servicio.empleados) && servicio.empleados.length > 0
+                      ? servicio.empleados.map((e) => e.nombre).join(', ')
+                      : <span style={{ color: '#888' }}>Sin asignar</span>}
+                  </td>
+                  <td>
+                    <button className="btn btn-edit" onClick={() => handleEdit(servicio)} style={{ marginRight: 8 }}>Editar</button>
+                    <button className="btn btn-danger" onClick={() => handleDelete(servicio.id)}>Eliminar</button>
                   </td>
                 </tr>
               ))
@@ -231,6 +292,3 @@ const ServicioView = () => {
 };
 
 export default ServicioView;
-
-
-
