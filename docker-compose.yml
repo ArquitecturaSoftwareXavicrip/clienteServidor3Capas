@@ -1,18 +1,29 @@
 version: '3.8'
 
 services:
-  # Tier 3: Base de Datos
+  # Tier 3: Base de Datos (local)
   database:
-    image: sqlite:latest
+    image: postgres:15
     container_name: limpieza_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: contraseña
+      POSTGRES_DB: limpieza_db
+    ports:
+      - "5432:5432"
     volumes:
-      - ./database:/data
+      - db_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     networks:
       - app-network
-    # Nota: SQLite no requiere un contenedor separado, pero se incluye para demostrar la separación de tiers
-    # En producción, usar PostgreSQL o MySQL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usuario -d limpieza_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Tier 2: Backend (Lógica de Negocio)
+  # Tier 2: Backend
   backend:
     build:
       context: ./backend
@@ -23,7 +34,8 @@ services:
     environment:
       - PORT=5001
       - FLASK_ENV=development
-      - SQLALCHEMY_DATABASE_URI=sqlite:///limpieza_empresas.db
+      - SQLALCHEMY_DATABASE_URI=postgresql://limpieza_user:limpieza_pass@database:5432/limpieza_db
+      - CORS_ORIGINS=http://172.17.191.154:3001,http://localhost:3001
     volumes:
       - ./backend:/app
       - ./database:/app/database
@@ -33,7 +45,7 @@ services:
       - app-network
     command: python run.py
 
-  # Tier 1: Frontend (Presentación)
+  # Tier 1: Frontend
   frontend:
     build:
       context: ./frontend
@@ -42,8 +54,9 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - REACT_APP_API_URL=http://localhost:5001/api
+      - REACT_APP_API_URL=http://172.17.187.102:5001/api
       - PORT=3001
+      - HOST=0.0.0.0
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -56,5 +69,9 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db_data:
+    name: limpieza_db_data
 
 
