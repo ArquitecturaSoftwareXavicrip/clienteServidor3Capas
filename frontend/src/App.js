@@ -22,6 +22,7 @@ function App() {
         return <ServicioView />;
       case 'contratos':
         return <ContratoView />;
+        
       default:
         return <EmpresaView />;
     }
