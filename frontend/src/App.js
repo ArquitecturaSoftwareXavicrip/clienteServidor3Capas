@@ -21,9 +21,9 @@ function App() {
         return <ServicioView />;
       case 'contratos':
         return <ContratoView />;
-      case 'empleados':   // <--- CORREGIDO: Ahora está antes del default
+      case 'empleados':
         return <EmpleadoView />;
-      default:            // <--- El default siempre va al final
+      default:
         return <EmpresaView />;
     }
   };
