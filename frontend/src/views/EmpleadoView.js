@@ -50,9 +50,8 @@ const EmpleadoView = () => {
       // Si solo implementamos create en el paso anterior, aquí usaremos create.
       if (editingId) {
         // Asumiendo que implementaste update en el backend/API
-        // await empleadosAPI.update(editingId, formData);
-        // setSuccess('Empleado actualizado correctamente');
-        console.warn("La actualización requiere implementar PUT en el backend");
+        await empleadosAPI.update(editingId, formData);
+        setSuccess('Empleado actualizado correctamente');
       } else {
         await empleadosAPI.create(formData);
         setSuccess('Empleado registrado correctamente');
