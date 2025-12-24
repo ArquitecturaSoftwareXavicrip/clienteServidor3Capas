@@ -29,7 +29,11 @@ def create_app():
     # Configurar CORS - Permitir orígenes desde variables de entorno
     cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:3001').split(',')
     CORS(app, resources={
-        r"/api/*": {"origins": cors_origins}
+        r"/api/*": {
+            "origins": cors_origins,
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
     })
     
     # Inicializar base de datos
