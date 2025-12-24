@@ -62,4 +62,7 @@ Thumbs.db
 .dockerignore
 
 
-
+# Custom Environment Variables
+.env
+backend/.env
+frontend/.env

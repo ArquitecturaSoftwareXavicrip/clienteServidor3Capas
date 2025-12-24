@@ -7,6 +7,7 @@ import EmpresaView from './views/EmpresaView';
 import ServicioView from './views/ServicioView';
 import ContratoView from './views/ContratoView';
 import './App.css';
+import EmpleadoView from './views/EmpleadoView';
 
 function App() {
   const [currentView, setCurrentView] = useState('empresas');
@@ -15,12 +16,16 @@ function App() {
     switch (currentView) {
       case 'empresas':
         return <EmpresaView />;
+      case 'empleados':
+        return <EmpleadoView />;
       case 'servicios':
         return <ServicioView />;
       case 'contratos':
-        return <ContratoView />;
+        return <ContratoView />;        
+
       default:
         return <EmpresaView />;
+      
     }
   };
 
@@ -47,6 +52,12 @@ function App() {
             onClick={() => setCurrentView('contratos')}
           >
             Contratos
+          </button>
+          <button
+            className={currentView === 'empleados' ? 'active' : ''}
+            onClick={() => setCurrentView('empleados')}
+          >
+            Empleados
           </button>
         </div>
       </div>
