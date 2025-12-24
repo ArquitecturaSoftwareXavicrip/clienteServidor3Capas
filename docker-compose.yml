@@ -34,7 +34,7 @@ services:
       - PORT=5001
       - FLASK_ENV=development
       - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://limpieza_user:limpieza_pass@database:5432/limpieza_db
-      - CORS_ORIGINS=http://172.27.160.1:3001
+      - CORS_ORIGINS=http://172.27.160.1:3001,http://localhost:3001,http://172.19.0.4:3001
     volumes:
       - ./backend:/app
       - ./database:/app/database
@@ -53,7 +53,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - REACT_APP_API_URL=http://172.17.186.22:5001/api
+      - REACT_APP_API_URL=http://backend:5001/api
       - PORT=3001
       - HOST=0.0.0.0
     volumes:
