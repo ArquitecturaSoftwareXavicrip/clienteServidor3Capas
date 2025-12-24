@@ -1,4 +1,9 @@
+/**
+ * Vista de Empleados - Tier 1: Presentación (MVC View)
+ * Componente React para la gestión y seguimiento de empleados
+ */
 import React, { useState, useEffect } from 'react';
+// Asegúrate de haber exportado empleadosAPI en services/api.js como vimos antes
 import { empleadosAPI } from '../services/api';
 
 const EmpleadoView = () => {
@@ -7,12 +12,14 @@ const EmpleadoView = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  
+  // Estado del formulario adaptado a la entidad Empleado
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
     email: '',
     telefono: '',
-    cargo: '',
+    cargo: ''
   });
 
   useEffect(() => { loadEmpleados(); }, []);
@@ -36,13 +43,18 @@ const EmpleadoView = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setError(null); setSuccess(null);
+      setError(null);
+      setSuccess(null);
+      
+      // La lógica sirve tanto para Crear como para Editar si el backend lo soporta
+      // Si solo implementamos create en el paso anterior, aquí usaremos create.
       if (editingId) {
+        // Asumiendo que implementaste update en el backend/API
         await empleadosAPI.update(editingId, formData);
-        setSuccess('Empleado actualizado');
+        setSuccess('Empleado actualizado correctamente');
       } else {
         await empleadosAPI.create(formData);
-        setSuccess('Empleado creado');
+        setSuccess('Empleado registrado correctamente');
       }
       resetForm();
       loadEmpleados();
@@ -55,21 +67,41 @@ const EmpleadoView = () => {
       nombre: empleado.nombre,
       apellido: empleado.apellido,
       email: empleado.email,
-      telefono: empleado.telefono,
-      cargo: empleado.cargo,
+      telefono: empleado.telefono || '',
+      cargo: empleado.cargo || '',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Eliminar empleado?')) return;
-    try { await empleadosAPI.delete(id); setSuccess('Empleado eliminado'); loadEmpleados(); }
-    catch (err) { setError(err.response?.data?.error || 'Error eliminando'); }
+    if (!window.confirm('¿Está seguro de dar de baja a este empleado?')) {
+      return;
+    }
+    
+    try {
+      setError(null);
+      await empleadosAPI.delete(id);
+      setSuccess('Empleado eliminado correctamente');
+      loadEmpleados();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al eliminar empleado');
+    }
   };
 
-  const resetForm = () => { setEditingId(null); setFormData({ nombre:'', apellido:'', email:'', telefono:'', cargo:'' }); };
+  const resetForm = () => {
+    setEditingId(null);
+    setFormData({
+      nombre: '',
+      apellido: '',
+      email: '',
+      telefono: '',
+      cargo: ''
+    });
+  };
 
-  if (loading) return <div>Cargando empleados...</div>;
+  if (loading) {
+    return <div className="loading">Cargando personal...</div>;
+  }
 
   return (
     <div className="container">
@@ -82,7 +114,8 @@ const EmpleadoView = () => {
             <label>Nombre:</label>
             <input name="nombre" value={formData.nombre} onChange={handleInputChange} required />
           </div>
-          <div>
+
+          <div className="form-group">
             <label>Apellido:</label>
             <input name="apellido" value={formData.apellido} onChange={handleInputChange} required />
           </div>
@@ -92,40 +125,89 @@ const EmpleadoView = () => {
           </div>
           <div>
             <label>Teléfono:</label>
-            <input name="telefono" value={formData.telefono} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleInputChange}
+            />
           </div>
-          <div>
+
+          <div className="form-group">
             <label>Cargo:</label>
-            <input name="cargo" value={formData.cargo} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="cargo"
+              value={formData.cargo}
+              onChange={handleInputChange}
+              placeholder="Ej: Supervisor, Limpieza..."
+            />
           </div>
-          <div>
-            <button type="submit">{editingId ? 'Actualizar' : 'Crear'}</button>
-            {editingId && <button type="button" onClick={resetForm}>Cancelar</button>}
+          
+          <div className="button-group">
+            <button type="submit" className="btn btn-primary">
+              {editingId ? 'Actualizar' : 'Registrar'}
+            </button>
+            {editingId && (
+              <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                Cancelar
+              </button>
+            )}
           </div>
         </form>
       </div>
 
       <div className="card">
-        <h2>Lista de Empleados</h2>
+        <h2>Plantilla de Empleados</h2>
         <table>
           <thead>
-            <tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Email</th><th>Teléfono</th><th>Cargo</th><th>Acciones</th></tr>
+            <tr>
+              <th>ID</th>
+              <th>Nombre Completo</th>
+              <th>Cargo</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
           </thead>
           <tbody>
             {empleados.length === 0 ? (
               <tr><td colSpan="7">No hay empleados</td></tr>
             ) : (
-              empleados.map(emp => (
-                <tr key={emp.id}>
-                  <td>{emp.id}</td>
-                  <td>{emp.nombre}</td>
-                  <td>{emp.apellido}</td>
-                  <td>{emp.email}</td>
-                  <td>{emp.telefono}</td>
-                  <td>{emp.cargo}</td>
+              empleados.map((empleado) => (
+                <tr key={empleado.id}>
+                  <td>{empleado.id}</td>
+                  <td>{empleado.nombre} {empleado.apellido}</td>
+                  <td>{empleado.cargo}</td>
+                  <td>{empleado.email}</td>
+                  <td>{empleado.telefono}</td>
                   <td>
-                    <button onClick={() => handleEdit(emp)}>Editar</button>
-                    <button onClick={() => handleDelete(emp.id)}>Eliminar</button>
+                    {/* Simulamos estado activo ya que en el modelo pusimos activo=True por defecto */}
+                    <span style={{ 
+                      backgroundColor: '#e6fffa', 
+                      color: '#047857', 
+                      padding: '4px 8px', 
+                      borderRadius: '4px',
+                      fontSize: '0.875rem'
+                    }}>
+                      Activo
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-edit"
+                      onClick={() => handleEdit(empleado)}
+                      style={{ marginRight: '5px' }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(empleado.id)}
+                    >
+                      Baja
+                    </button>
                   </td>
                 </tr>
               ))
