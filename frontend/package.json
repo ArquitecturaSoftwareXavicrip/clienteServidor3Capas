@@ -4,13 +4,13 @@
   "description": "Frontend - Tier 1: Presentación - Aplicación de Servicios de Limpieza",
   "private": true,
   "dependencies": {
+    "axios": "^1.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "axios": "^1.6.0"
+    "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "PORT=3001 react-scripts start",
+    "start": "cross-env PORT=3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -32,7 +32,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5001"
+  "proxy": "http://localhost:5001",
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
 }
-
-
